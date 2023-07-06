@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+
+/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+  background-color: #555;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup chat - hidden by default */
+.chat-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+  width: 300px;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width textarea */
+.form-container textarea {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+  resize: none;
+  min-height: 200px;
+}
+
+/* When the textarea gets focus, do something */
+.form-container textarea:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/send button */
+.form-container .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+</style>
+</head>
+<body>
+
+<h2>Chat Window</h2>
+<p>I am a motivational AI assistant created specifically to help people get a healthier life through being active.</p>
+<form method="POST" th:action="@{/chat/recommendations/user}">
+Choose a user:
+<select id="selectedUser" name="selectedUser" onchange="changeWorkouts()">
+  <option th:each="user : ${users}" th:value="${user.user.id}" th:text="|${user.user.firstName} ${user.user.lastName}|" th:data-workouts="${user.workouts}">
+</select></br></br>
+
+<div class="chat-popup" id="myForm">
+
+    <div class="form-container">
+    <h1>Chat</h1>
+
+        <div id="filters">
+        Include only activities you already did previously:</br>
+    <select id="filterActivities" name="filterActivities" multiple>
+    </select></br></br>
+            </div>
+
+    <div id="recommendation">
+        Select type of recommendation: </br></br>
+        <input type="radio" th:name="type" value="daily" checked/>Today</br>
+        <input type="radio" th:name="type" value="weekly" />This week</br>
+        <input type="radio" th:name="type" value="dietary" />Dietary advices</br>
+        <input type="radio" th:name="type" value="start" />Get into running</br></br>
+
+        <button type="submit" class="btn" id="submitBtn">Send</button>
+    </div>
+        <button type="button" class="btn" onclick="nextForm()" id="next">Next</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    </div>
+</div>
+</form>
+<button class="open-button" onclick="openForm()">Chat</button>
+
+<script>
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+  document.getElementById("recommendation").style.display = "none";
+  changeWorkouts();
+}
+
+function changeWorkouts() {
+    let element = document.getElementById("selectedUser");
+    let workouts = element.options[element.selectedIndex].getAttribute("data-workouts");
+    var temp = new Array();
+    temp = workouts.split(",");
+    var filterActivities = document.getElementById("filterActivities");
+    while (filterActivities.options.length > 0) {
+        filterActivities.remove(0);
+    }
+
+    for (a in temp ) {
+        var option = document.createElement("option");
+        option.text = temp[a];
+        filterActivities.add(option);
+    }
+}
+
+function nextForm() {
+  document.getElementById("myForm").style.display = "block";
+  document.getElementById("recommendation").style.display = "block";
+  document.getElementById("filters").style.display = "none";
+  document.getElementById("next").style.display = "none";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+</script>
+
+</body>
+</html>
